@@ -1,4 +1,4 @@
--- 🚀 Pet GUI Combo: Mobile Pet Randomizer + Mutation Finder (Modified by ChatGPT)
+-- 🚀 Pet GUI Combo: Mobile Pet Randomizer + Mutation Finder (By DRXSCRIPTS)
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
@@ -55,7 +55,7 @@ end
 -- 🐣 Egg & Pet Pools
 local eggNames = {
     "Bug Egg", "Night Egg", "Mythical Egg", "Paradise Egg",
-    "Oasis Egg", "Primal Egg", "Dinosaur Egg", "Zen Egg"
+    "Oasis Egg", "Primal Egg", "Dinosaur Egg", "Zen Egg" "Gourmet Egg"
 }
 
 local PET_POOL = {
@@ -68,9 +68,10 @@ local PET_POOL = {
     ["Mythical Egg"] = {"Squirrel", "Red Giant Ant", "Grey Mouse", "Brown Mouse", "Red Fox"},
     ["Paradise Egg"] = {"Ostrich", "Peacock", "Capybara", "Mimic Octopus"},
     ["Oasis Egg"] = {"Meerkat", "Sandsnake", "Oxolotl", "Fennec Fox"},
-    ["Primal Egg"] = {"Parasaurolophus", "Iguanodon", "Dilophosaurus", "Ankylosaurus", "Spinosaurus", "Pachycephalosaurus"},
+    ["Primal Egg"] = {"Parasaurolophus", "Iguanodon", "Dilophosaurus", "Ankylosaurus", "Spinosaurus" "Pachycephalosaurus"},
     ["Dinosaur Egg"] = {"T-Rex", "Raptor", "Triceratops", "Pterodactyl", "Brontosaurus"},
     ["Zen Egg"] = { "Shiba Inu", "Nihonzaru", "Tanuki", "Tanchouzuru", "Kappa", "Kitsune" },
+    ["Gourmet Egg"] = { "Bagel Bunny", "Pancake Mole", "Sushi Bear", "Spaghetti Sloth", "French Fry Ferret" },
 }
 
 local function predictPet(egg)
@@ -96,10 +97,10 @@ local function attachRandomizerGUI(eggModel, predicted)
     gui.AlwaysOnTop = true
 
     local frame = Instance.new("Frame", gui)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 20, 80)
+    frame.BackgroundColor3 = Color3.fromRGB(50, 0, 90)
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BorderSizePixel = 2
-    frame.BorderColor3 = Color3.fromRGB(255, 100, 200)
+    frame.BorderColor3 = Color3.fromRGB(200, 100, 255)
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
 
     local title = Instance.new("TextLabel", frame)
@@ -125,44 +126,49 @@ local function attachRandomizerGUI(eggModel, predicted)
     credit.Size = UDim2.new(1, 0, 0.3, 0)
     credit.Position = UDim2.new(0, 0, 0.7, 0)
     credit.BackgroundTransparency = 1
-    credit.TextColor3 = Color3.fromRGB(255, 100, 200)
+    credit.TextColor3 = Color3.fromRGB(0, 255, 255)
     credit.Font = Enum.Font.Gotham
     credit.TextScaled = true
 end
 
--- 📱 Mobile Button GUI
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 220, 0, 60)
-frame.Position = UDim2.new(0.5, -110, 0.85, 0)
-frame.BackgroundColor3 = Color3.fromRGB(44, 0, 62)
-frame.BorderSizePixel = 2
-frame.BorderColor3 = Color3.fromRGB(200, 100, 255)
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+-- 📱 UI with Buttons (restored from screenshot)
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 60)
+mainFrame.Size = UDim2.new(0, 220, 0, 180)
+mainFrame.Position = UDim2.new(0.5, -110, 0.75, 0)
+mainFrame.BorderSizePixel = 0
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
-local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(1, 0, 1, 0)
-btn.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
-btn.Text = "🎲 REROLL EGG"
-btn.TextScaled = true
-btn.Font = Enum.Font.GothamBold
-btn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+local uiTitle = Instance.new("TextLabel", mainFrame)
+uiTitle.Text = "🥚 Pet Randomizer 🧬"
+uiTitle.Size = UDim2.new(1, 0, 0.2, 0)
+uiTitle.BackgroundTransparency = 1
+uiTitle.TextColor3 = Color3.new(1, 1, 1)
+uiTitle.Font = Enum.Font.GothamBold
+uiTitle.TextScaled = true
 
--- 🐣 Button Function: Predict Eggs Nearby
-btn.MouseButton1Click:Connect(function()
-    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not root then return end
+local function createButton(text, color, pos)
+    local btn = Instance.new("TextButton", mainFrame)
+    btn.Size = UDim2.new(0.9, 0, 0.2, 0)
+    btn.Position = UDim2.new(0.05, 0, pos, 0)
+    btn.BackgroundColor3 = color
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end
 
-    for _, egg in pairs(Workspace:GetDescendants()) do
-        if table.find(eggNames, egg.Name) and egg:IsA("Model") then
-            local part = egg:FindFirstChildWhichIsA("BasePart")
-            if part and (part.Position - root.Position).Magnitude <= 30 then
-                if egg:FindFirstChild("ESP") then egg.ESP:Destroy() end
-                if egg:FindFirstChild("DIVINE") then egg.DIVINE:Destroy() end
+local randomBtn = createButton("🎲 Randomize Pets", Color3.fromRGB(0, 255, 255), 0.2)
+local espBtn = createButton("👁 ESP: ON", Color3.fromRGB(255, 100, 120), 0.42)
+local finderBtn = createButton("🧬 Pet Mutation Finder", Color3.fromRGB(255, 170, 200), 0.64)
 
-                local predicted = predictPet(egg)
-                attachRandomizerGUI(egg, predicted)
-            end
-        end
-    end
-end)
+local credit = Instance.new("TextLabel", mainFrame)
+credit.Text = "modded by ChatGPT"
+credit.Size = UDim2.new(1, 0, 0.15, 0)
+credit.Position = UDim2.new(0, 0, 0.85, 0)
+credit.BackgroundTransparency = 1
+credit.TextColor3 = Color3.fromRGB(200, 200, 255)
+credit.Font = Enum.Font.Gotham
+credit.TextScaled = true
