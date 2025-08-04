@@ -1,0 +1,168 @@
+-- 🚀 Pet GUI Combo: Mobile Pet Randomizer + Mutation Finder (Modified by ChatGPT)
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+
+-- 📦 GUI Screen
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetComboGUI"
+gui.ResetOnSpawn = false
+gui.Parent = CoreGui
+
+-- 🧬 Mutation ESP (unchanged)
+local mutations = {
+    "Shiny", "Inverted", "Frozen", "Windy", "Golden", "Mega", "Tiny",
+    "Tranquil", "IronSkin", "Radiant", "Rainbow", "Shocked", "Ascended"
+}
+local currentMutation = "Shiny"
+
+local function findMachine()
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj.Name:lower():find("mutation") then
+            return obj
+        end
+    end
+end
+
+local machine = findMachine()
+local base = machine and machine:FindFirstChildWhichIsA("BasePart")
+local espLabel
+
+if base then
+    local espGui = Instance.new("BillboardGui", base)
+    espGui.Name = "MutationESP"
+    espGui.Adornee = base
+    espGui.Size = UDim2.new(0, 200, 0, 40)
+    espGui.StudsOffset = Vector3.new(0, 3, 0)
+    espGui.AlwaysOnTop = true
+
+    espLabel = Instance.new("TextLabel", espGui)
+    espLabel.Size = UDim2.new(1, 0, 1, 0)
+    espLabel.BackgroundTransparency = 1
+    espLabel.Font = Enum.Font.GothamBold
+    espLabel.TextScaled = true
+    espLabel.TextStrokeTransparency = 0.3
+    espLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+    espLabel.Text = currentMutation
+
+    RunService.RenderStepped:Connect(function()
+        espLabel.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    end)
+end
+
+-- 🐣 Egg & Pet Pools
+local eggNames = {
+    "Bug Egg", "Night Egg", "Mythical Egg", "Paradise Egg",
+    "Oasis Egg", "Primal Egg", "Dinosaur Egg", "Zen Egg"
+}
+
+local PET_POOL = {
+    ["Common Egg"] = { "Dog", "Bunny", "Golden Lab" },
+    ["Uncommon Egg"] = { "Chicken", "Black Bunny", "Cat", "Deer" },
+    ["Rare Egg"] = { "Pig", "Monkey", "Rooster", "Orange Tabby", "Spotted Deer" },
+    ["Legendary Egg"] = { "Cow", "Polar Bear", "Sea Otter", "Turtle", "Silver Monkey" },
+    ["Bug Egg"] = {"Snail", "Giant Ant", "Praying Mantis", "Dragonfly"},
+    ["Night Egg"] = {"Echo Frog", "Raccoon", "Night Owl", "Hedgehog", "Caterpillar"},
+    ["Mythical Egg"] = {"Squirrel", "Red Giant Ant", "Grey Mouse", "Brown Mouse", "Red Fox"},
+    ["Paradise Egg"] = {"Ostrich", "Peacock", "Capybara", "Mimic Octopus"},
+    ["Oasis Egg"] = {"Meerkat", "Sandsnake", "Oxolotl", "Fennec Fox"},
+    ["Primal Egg"] = {"Parasaurolophus", "Iguanodon", "Dilophosaurus", "Ankylosaurus", "Spinosaurus", "Pachycephalosaurus"},
+    ["Dinosaur Egg"] = {"T-Rex", "Raptor", "Triceratops", "Pterodactyl", "Brontosaurus"},
+    ["Zen Egg"] = { "Shiba Inu", "Nihonzaru", "Tanuki", "Tanchouzuru", "Kappa", "Kitsune" },
+}
+
+local function predictPet(egg)
+    local pool = PET_POOL[egg.Name]
+    if not pool then return nil end
+    return pool[math.random(1, #pool)]
+end
+
+-- 🖼 Billboard GUI beside Egg
+local function attachRandomizerGUI(eggModel, predicted)
+    if eggModel:FindFirstChild("PET_RANDOMIZER_GUI") then
+        eggModel.PET_RANDOMIZER_GUI:Destroy()
+    end
+
+    local part = eggModel:FindFirstChildWhichIsA("BasePart")
+    if not part then return end
+
+    local gui = Instance.new("BillboardGui", eggModel)
+    gui.Name = "PET_RANDOMIZER_GUI"
+    gui.Adornee = part
+    gui.Size = UDim2.new(0, 200, 0, 80)
+    gui.StudsOffset = Vector3.new(0, 3, 0)
+    gui.AlwaysOnTop = true
+
+    local frame = Instance.new("Frame", gui)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 20, 80)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BorderSizePixel = 2
+    frame.BorderColor3 = Color3.fromRGB(255, 100, 200)
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
+
+    local title = Instance.new("TextLabel", frame)
+    title.Text = "🥚 PET RANDOMIZER 🧬"
+    title.Size = UDim2.new(1, 0, 0.4, 0)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.Font = Enum.Font.GothamBold
+    title.TextScaled = true
+
+    local result = Instance.new("TextLabel", frame)
+    result.Text = predicted
+    result.Size = UDim2.new(1, 0, 0.3, 0)
+    result.Position = UDim2.new(0, 0, 0.4, 0)
+    result.BackgroundTransparency = 1
+    result.TextColor3 = Color3.fromRGB(255, 255, 0)
+    result.Font = Enum.Font.GothamBold
+    result.TextScaled = true
+
+    local credit = Instance.new("TextLabel", frame)
+    credit.Text = "modded by ChatGPT"
+    credit.Size = UDim2.new(1, 0, 0.3, 0)
+    credit.Position = UDim2.new(0, 0, 0.7, 0)
+    credit.BackgroundTransparency = 1
+    credit.TextColor3 = Color3.fromRGB(255, 100, 200)
+    credit.Font = Enum.Font.Gotham
+    credit.TextScaled = true
+end
+
+-- 📱 Mobile Button GUI
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 220, 0, 60)
+frame.Position = UDim2.new(0.5, -110, 0.85, 0)
+frame.BackgroundColor3 = Color3.fromRGB(44, 0, 62)
+frame.BorderSizePixel = 2
+frame.BorderColor3 = Color3.fromRGB(200, 100, 255)
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(1, 0, 1, 0)
+btn.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+btn.Text = "🎲 REROLL EGG"
+btn.TextScaled = true
+btn.Font = Enum.Font.GothamBold
+btn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+
+-- 🐣 Button Function: Predict Eggs Nearby
+btn.MouseButton1Click:Connect(function()
+    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    for _, egg in pairs(Workspace:GetDescendants()) do
+        if table.find(eggNames, egg.Name) and egg:IsA("Model") then
+            local part = egg:FindFirstChildWhichIsA("BasePart")
+            if part and (part.Position - root.Position).Magnitude <= 30 then
+                if egg:FindFirstChild("ESP") then egg.ESP:Destroy() end
+                if egg:FindFirstChild("DIVINE") then egg.DIVINE:Destroy() end
+
+                local predicted = predictPet(egg)
+                attachRandomizerGUI(egg, predicted)
+            end
+        end
+    end
+end)
