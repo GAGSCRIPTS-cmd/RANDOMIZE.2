@@ -124,7 +124,7 @@ local TARGET_PETS = {
 -- 🐣 Egg Data
 local eggNames = {
     "Bug Egg", "Night Egg", "Mythical Egg", "Paradise Egg",
-    "Oasis Egg", "Primal Egg", "Dinosaur Egg", "Zen Egg"
+    "Oasis Egg", "Primal Egg", "Dinosaur Egg", "Zen Egg" "Gourmet Egg"
 }
 
 local PET_POOL = {
@@ -140,6 +140,7 @@ local PET_POOL = {
     ["Primal Egg"] = {"Parasaurolophus", "Iguanodon", "Dilophosaurus", "Ankylosaurus", "Spinosaurus"},
     ["Dinosaur Egg"] = {"T-Rex", "Raptor", "Triceratops", "Pterodactyl", "Brontosaurus"},
     ["Zen Egg"] = { "Shiba Inu", "Nihonzaru", "Tanuki", "Tanchouzuru", "Kappa", "Kitsune" },
+    ["Gourmet Egg"] = { "Bagel Bunny", "Pancake Mole", "Sushi Bear", "Spaghetti Sloth", "French Fry Ferret" },
 }
 
 local function predictPet(egg)
